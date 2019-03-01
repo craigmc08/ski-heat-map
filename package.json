@@ -1,0 +1,12 @@
+{
+  "name": "ski-heat-map",
+  "version": "1.0.0",
+  "description": "Create heat maps of multiple related gpx tracks",
+  "main": "index.js",
+  "author": "craigmc08",
+  "license": "WTFPL",
+  "private": true,
+  "dependencies": {
+    "parse-gpx": "^1.2.0"
+  }
+}
