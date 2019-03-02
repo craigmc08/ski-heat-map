@@ -2,19 +2,24 @@
 # yarn lockfile v1
 
 
-parse-gpx@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/parse-gpx/-/parse-gpx-1.2.0.tgz#1a38063f78736e7a23ae1389ff8933a304474fd1"
-  integrity sha512-uIjZoMmbjBXfc5XNU0gOgD4qW94LJCdvCMciN/ksomYARWdCTiAgnX8rEwU6ydLPP+eeI1AQHQWUDBrQfInWyw==
+"@craigmc08/parse-gpx@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@craigmc08/parse-gpx/-/parse-gpx-1.0.0.tgz#5d9eb9d72e30eafdc75cd390e89759c19a6aa32b"
+  integrity sha512-yDtltx+dUS5pugr9KRnEk7HIXJy/TqCEY4TNapmzdq+fUg4UF04EuSm1Uy0N+CISpJvABc2XL6EXMPEZhjM8Mw==
   dependencies:
-    xml2js "^0.4.16"
+    xml2js "^0.4.19"
+
+pngjs@^3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/pngjs/-/pngjs-3.3.3.tgz#85173703bde3edac8998757b96e5821d0966a21b"
+  integrity sha512-1n3Z4p3IOxArEs1VRXnZ/RXdfEniAUS9jb68g58FIXMNkPJeZd+Qh4Uq7/e0LVxAQGos1eIUrqrt4FpjdnEd+Q==
 
 sax@>=0.6.0:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
 
-xml2js@^0.4.16:
+xml2js@^0.4.19:
   version "0.4.19"
   resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
   integrity sha512-esZnJZJOiJR9wWKMyuvSE1y6Dq5LCuJanqhxslH2bxM6duahNZ+HMpCLhBQGZkbX6xRf8x1Y2eJlgt2q3qo49Q==
