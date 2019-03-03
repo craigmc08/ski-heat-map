@@ -21,30 +21,27 @@ const arcLength = radius => angle => radius * angle;
 const earthRadius = 20900000; // In feet
 const earthArcLength = arcLength(earthRadius);
 
-const calculateVelocities = track => {
-    const velocities = [];
-    for (let i = 0; i < track.length; i++) {
-        const startPoint = track[i === 0 ? 0 : i - 1];
-        const endPoint = track[i === 0 ? 1 : i];
+const extractPositionsFromPoint = track => [
+    earthArcLength(track.latitude),
+    earthArcLength(track.longitude),
+    track.elevation,
+]
 
-        const deltaLatitude = endPoint.latitude - startPoint.latitude;
-        const deltaLongitude = endPoint.longitude - startPoint.longitude;
-        
-        const deltaLatFeet = earthArcLength(deltaLatitude);
-        const deltaLonFeet = earthArcLength(deltaLongitude);
-        const deltaEleFeet = endPoint.elevation - startPoint.elevation;
+const differentiateVectorArray = vectors => {
+    const gradients = [];
+    for (let i = 0; i < vectors; i++) {
+        const startIndex = i === 0 ? 0 : i - 1;
+        const startVec = vectors[startIndex];
+        const endVec = vectors[startIndex + 1];
 
-        const magnitude = Math.sqrt(deltaLatFeet*deltaLatFeet + deltaLonFeet*deltaLonFeet + deltaEleFeet*deltaEleFeet);
-        const velocity = [
-            deltaLatFeet / magnitude,
-            deltaLonFeet / magnitude,
-            deltaEleFeet / magnitude,
-        ];
+        const dx = endVec[0] - startVec[0];
+        const dy = endVec[1] - startVec[1];
+        const dz = endVec[2] - startVec[2];
 
-        velocities.push(velocity);
+        const gradient = [dx, dy, dz];
+        gradients.push(gradient);
     }
-    
-    return velocities;
+    return gradients;
 }
 
 /**
