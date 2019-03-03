@@ -21,11 +21,12 @@ const arcLength = radius => angle => radius * angle;
 const earthRadius = 20900000; // In feet
 const earthArcLength = arcLength(earthRadius);
 
-const extractPositionFromPoint = track => [
-    earthArcLength(track.latitude),
-    earthArcLength(track.longitude),
-    track.elevation,
-]
+const extractPositionFromPoint = trackPoint => ({
+    x: earthArcLength(trackPoint.latitude),
+    y: earthArcLength(trackPoint.longitude),
+    z: trackPoint.elevation,
+    time: new Date(trackPoint.time).getTime() / 1000,
+})
 
 const differentiateVectorArray = vectors => {
     const gradients = [];
@@ -34,11 +35,17 @@ const differentiateVectorArray = vectors => {
         const startVec = vectors[startIndex];
         const endVec = vectors[startIndex + 1];
 
-        const dx = endVec[0] - startVec[0];
-        const dy = endVec[1] - startVec[1];
-        const dz = endVec[2] - startVec[2];
+        const dx = endVec.x - startVec.x;
+        const dy = endVec.y - startVec.y;
+        const dz = endVec.z - startVec.z;
+        const dt = endVec.time - startVec.time;
 
-        const gradient = [dx, dy, dz];
+        const gradient = {
+            x: dx / dt,
+            y: dy / dt,
+            z: dz / dt,
+            time: vectors[i].time,
+        };
         gradients.push(gradient);
     }
     return gradients;
