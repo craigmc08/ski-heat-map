@@ -51,6 +51,8 @@ const differentiateVectorArray = vectors => {
     return gradients;
 }
 
+const sqrMagnitude = vector => vector.x*vector.x + vector.y*vector.y + vector.z*vector.z;
+
 /**
  * Remove detected lift rides from a track
  * @param {Object[]} track - Array of all gps points
@@ -60,5 +62,14 @@ module.exports = function FilterLifts(track) {
     const positions = track.map(extractPositionFromPoint);
     const velocities = differentiateVectorArray(positions);
     const accelerations = differentiateVectorArray(velocities);
-    return track;
+
+    const hasSmallAcceleration = accelerations.map(acceleration => (
+        sqrMagnitude(acceleration) < 0.1
+    ));
+
+    const isLiftPoint = hasSmallAcceleration;
+
+    const filteredTrack = track.filter((point, i) => !isLiftPoint[i]);
+
+    return filteredTrack;
 }
