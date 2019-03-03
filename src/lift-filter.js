@@ -53,6 +53,27 @@ const differentiateVectorArray = vectors => {
 
 const sqrMagnitude = vector => vector.x*vector.x + vector.y*vector.y + vector.z*vector.z;
 
+const isSandwiched = bread => breadArray => {
+    const maxBreadDistance = 5;
+
+    const meatArray = [];
+    for (let i = 0; i < breadArray.length; i++) {
+        const isAtEnd = i < maxBreadDistance || i > breadArray.length - maxBreadDistance;
+        if (isAtEnd) {
+            meatArray.push(false);
+            continue; // I'm sorry
+        }
+
+        let sandwiched = false;
+        for (let j = i - maxBreadDistance; j < i + maxBreadDistance && !sandwiched; j++) {
+            if (breadArray[j] === bread) sandwiched = true;
+        }
+        meatArray.push(sandwiched);
+    }
+
+    return meatArray;
+}
+
 /**
  * Remove detected lift rides from a track
  * @param {Object[]} track - Array of all gps points
@@ -67,7 +88,10 @@ module.exports = function FilterLifts(track) {
         sqrMagnitude(acceleration) < 0.1
     ));
 
-    const isLiftPoint = hasSmallAcceleration;
+    const isSandwichedByLifts = isSandwiched(true)(hasSmallAcceleration);
+
+    // && the 2 filter arrays
+    const isLiftPoint = hasSmallAcceleration.map((hsa, i) => hsa || isSandwichedByLifts[i]);
 
     const filteredTrack = track.filter((point, i) => !isLiftPoint[i]);
 
