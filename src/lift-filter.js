@@ -53,9 +53,7 @@ const differentiateVectorArray = vectors => {
 
 const sqrMagnitude = vector => vector.x*vector.x + vector.y*vector.y + vector.z*vector.z;
 
-const isSandwiched = bread => breadArray => {
-    const maxBreadDistance = 5;
-
+const isSandwiched = (bread, maxBreadDistance) => breadArray => {
     const meatArray = [];
     for (let i = 0; i < breadArray.length; i++) {
         const isAtEnd = i < maxBreadDistance || i > breadArray.length - maxBreadDistance;
@@ -77,18 +75,29 @@ const isSandwiched = bread => breadArray => {
 /**
  * Remove detected lift rides from a track
  * @param {Object[]} track - Array of all gps points
+ * @param {Object} options
+ * @param {number} options.accelerationThreshold - Value of acceleration to be considered small
+ * @param {number} options.liftSandwichDistance - Distance to look for lift rides
  * @returns {Object[]} Array of gps points that are not lift rides
  */
-module.exports = function FilterLifts(track) {
+module.exports = function FilterLifts(track, options) {
+    const defaultOptions = {
+        accelerationThreshold: 0.1,
+        liftSandwichDistance: 5,
+    };
+    const { accelerationThreshold, liftSandwichDistance } = Object.assign(
+        {}, defaultOptions, options
+    );
+
     const positions = track.map(extractPositionFromPoint);
     const velocities = differentiateVectorArray(positions);
     const accelerations = differentiateVectorArray(velocities);
 
     const hasSmallAcceleration = accelerations.map(acceleration => (
-        sqrMagnitude(acceleration) < 0.1
+        sqrMagnitude(acceleration) < accelerationThreshold
     ));
 
-    const isSandwichedByLifts = isSandwiched(true)(hasSmallAcceleration);
+    const isSandwichedByLifts = isSandwiched(true, liftSandwichDistance)(hasSmallAcceleration);
 
     // && the 2 filter arrays
     const isLiftPoint = hasSmallAcceleration.map((hsa, i) => hsa || isSandwichedByLifts[i]);
