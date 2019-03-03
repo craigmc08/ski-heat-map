@@ -21,7 +21,7 @@ const arcLength = radius => angle => radius * angle;
 const earthRadius = 20900000; // In feet
 const earthArcLength = arcLength(earthRadius);
 
-const extractPositionsFromPoint = track => [
+const extractPositionFromPoint = track => [
     earthArcLength(track.latitude),
     earthArcLength(track.longitude),
     track.elevation,
@@ -50,5 +50,8 @@ const differentiateVectorArray = vectors => {
  * @returns {Object[]} Array of gps points that are not lift rides
  */
 module.exports = function FilterLifts(track) {
+    const positions = track.map(extractPositionFromPoint);
+    const velocities = differentiateVectorArray(positions);
+    const accelerations = differentiateVectorArray(velocities);
     return track;
 }
