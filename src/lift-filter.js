@@ -74,13 +74,12 @@ const isSandwiched = (bread, maxBreadDistance) => breadArray => {
 
 /**
  * Remove detected lift rides from a track
- * @param {Object[]} track - Array of all gps points
  * @param {Object} options
- * @param {number} options.accelerationThreshold - Value of acceleration to be considered small
- * @param {number} options.liftSandwichDistance - Distance to look for lift rides
- * @returns {Object[]} Array of gps points that are not lift rides
+ * @param {number?} options.accelerationThreshold - Value of acceleration to be considered small
+ * @param {number?} options.liftSandwichDistance - Distance to look for lift rides
+ * @returns {function(Object[]): Object[]} Filtering function
  */
-module.exports = function FilterLifts(track, options) {
+module.exports = options => track => {
     const defaultOptions = {
         accelerationThreshold: 0.1,
         liftSandwichDistance: 5,
