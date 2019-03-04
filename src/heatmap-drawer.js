@@ -19,14 +19,14 @@ function CalculateTrackBounds(track, paddingPercent) {
     const raw_width = (maxlon - minlon);
     const padding = raw_width * paddingPercent * 2;
 
-    const width = raw_width + padding;
-    const height = (maxlat - minlat) + padding;
+    const width = raw_width + 2 * padding;
+    const height = (maxlat - minlat) + 2 * padding;
     const depth = maxele - minele;
 
     const north = maxlat + padding;
     const south = minlat - padding;
     const east = maxlon + padding;
-    const west = minlon + padding;
+    const west = minlon - padding;
 
     return {
         width,
