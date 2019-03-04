@@ -4,6 +4,7 @@ const { filterAnyOf } = require('./util');
 
 const PNG = require('pngjs').PNG;
 const fs = require('fs');
+const chalk = require('chalk');
 
 const defaultOptions = {
     tracksDir: null,
@@ -13,6 +14,9 @@ const defaultOptions = {
     filters: [ () => true ],
 };
 
+const logInfo = str => console.log(chalk.white(str));
+const logDetail = str => console.log(chalk.green(str));
+
 module.exports = async function Main(opts) {
     const options = Object.assign({}, defaultOptions, opts);
 
@@ -20,13 +24,13 @@ module.exports = async function Main(opts) {
     if (tracksDir === null) throw new TypeError('tracksDir is a required option, but is not given.');
     if (outputFile === null) throw new TypeError('outputFile is a required option, but is not given.');
 
-    console.log(`Loading tracks from ${tracksDir}`);
+    logInfo(`Loading tracks from ${chalk.yellow(tracksDir)}`);
     const gpxs = await loadTracks(tracksDir);
-    console.log(`Tracks loaded`);
+    logInfo(`Tracks loaded`);
 
     const tracks = gpxs.map(gpx => gpx.tracks);
 
-    console.log(`Applying ${opts.filters ? filters.length : 0} track filters`);
+    logInfo(`Applying ${chalk.yellow(opts.filters ? filters.length : 0)} track filters`);
     const filteredTracks = tracks.map(
         track => track.map(trkseg => trkseg.filter(filterAnyOf(filters)))
     );
@@ -34,17 +38,17 @@ module.exports = async function Main(opts) {
     // Combine all trksegs in all gpx files
     const flatten = arr => arr.reduce((flat, el) => flat.concat(el), []);
     const track = flatten(filteredTracks.map(trksegs => flatten(trksegs)));
-    console.log(`Tracks concatenated`);
+    logInfo(`Tracks concatenated`);
     
-    console.log(`Drawing heat map`);
+    logInfo(`Drawing heat map`);
     const { pixels, width, height, bounds } = drawTracks(track, imageWidth, coordinatePaddingPercent);
-    console.log(`Heatmap pixel data calculated`);
+    logInfo(`Heatmap pixel data calculated`);
 
-    console.log(`Heatmap bound data:
-(${bounds.maxlat}, ${bounds.maxlon})
-(${bounds.minlat}, ${bounds.minlon})`);
+    logDetail(`Heatmap bound coordinates (degrees):
+(${chalk.yellow(bounds.maxlat)}, ${chalk.yellow(bounds.maxlon)})
+(${chalk.yellow(bounds.minlat)}, ${chalk.yellow(bounds.minlon)})`);
     
-    console.log(`Writing image to ${outputFile}`);
+    logInfo(`Writing image to ${chalk.yellow(outputFile)}`);
 
     const image = new PNG({ width, height });
     image.data = pixels;
