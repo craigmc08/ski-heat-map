@@ -18,6 +18,7 @@ const logInfo = str => console.log(chalk.white(str));
 const logDetail = str => console.log(chalk.green(str));
 
 module.exports = async function Main(opts) {
+    const startTime = Date.now();
     const options = Object.assign({}, defaultOptions, opts);
 
     const { tracksDir, outputFile, imageWidth, coordinatePaddingPercent, filters } = options;
@@ -33,7 +34,7 @@ module.exports = async function Main(opts) {
     logInfo(`Applying ${chalk.yellow(opts.filters ? filters.length : 0)} track filters`);
     let filteredTracks = tracks;
     if (filters.length > 0) 
-        filters.forEach(filter => filteredTracks = tracks.map(segs => segs.map(filter)));
+        filters.forEach(filter => filteredTracks = filteredTracks.map(segs => segs.map(filter)));
 
     // Combine all trksegs in all gpx files
     const flatten = arr => arr.reduce((flat, el) => flat.concat(el), []);
@@ -49,6 +50,10 @@ module.exports = async function Main(opts) {
 (${chalk.yellow(bounds.minlat)}, ${chalk.yellow(bounds.minlon)})`);
     
     logInfo(`Writing image to ${chalk.yellow(outputFile)}`);
+
+    const endTime = Date.now();
+    const timeToComplete = (endTime - startTime) / 1000;
+    logInfo(`Took ${chalk.yellow(`${timeToComplete} second${timeToComplete !== 1 ? 's': ''}`)} to generate heatmap`);
 
     const image = new PNG({ width, height });
     image.data = pixels;
