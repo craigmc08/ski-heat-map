@@ -93,7 +93,9 @@ module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercen
             const [lon, lat] = screenToWorld([x, y]);
             for (let i = 0; i < track.length; i++) {
                 const sqrDist = (lat - track[i].latitude)**2 + (lon - track[i].longitude)**2;
-                if (sqrDist <= sqrDistThreshold) count++;
+                if (sqrDist <= sqrDistThreshold) {
+                    count += 1 - sqrDist / sqrDistThreshold;
+                }
             }
             countMap[y][x] = count;
             totalCount += count;
