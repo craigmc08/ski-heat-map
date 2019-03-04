@@ -102,6 +102,16 @@ const differentiateScalarArray = scalars => {
     return derivatives;
 };
 
+const slidingAverage = windowRadius => values => {
+    const clampedSlice = (arr, s, e) => arr.slice(Math.max(s, 0), Math.min(e, arr.length));
+    const averages = values.map((value, i) => {
+        const segment = clampedSlice(values, i - windowRadius, i + windowRadius + 1);
+        const sum = segment.reduce((a, b) => a + b, 0);
+        return sum / segment.length;
+    });
+    return averages;
+}
+
 /**
  * 
  * @param {Object} options
@@ -111,21 +121,23 @@ const differentiateScalarArray = scalars => {
 const filterLiftsV2 = options => track => {
     const defaultOptions = {
         timeGoingUpHill: 5, // in seconds
+        slidingAverageWindowSize: 2,
     };
-    const { timeGoingUpHill } = Object.assign({}, defaultOptions, options);
+    const { timeGoingUpHill, slidingAverageWindowSize } = Object.assign({}, defaultOptions, options);
 
     const positions = track.map(point => ({
         y: point.elevation,
         t: point.time.getTime() / 1000,
     }));
     const velocities = differentiateScalarArray(positions);
+    const smoothVelocities = slidingAverage(slidingAverageWindowSize)(velocities.map(v => v.y));
 
     let isLift = [...new Array(velocities.length)].fill(false);
     let movedUp = false;
     let startedMovingUpTime = -1;
     let startedMovingUpIndex = -1;
     for (let i = 0; i < velocities.length; i++) {
-        const movingUp = velocities[i].y > 0;
+        const movingUp = smoothVelocities[i] > 0;
         if (movingUp && !movedUp) {
             startedMovingUpIndex = i;
             startedMovingUpTime = velocities[i].t;
