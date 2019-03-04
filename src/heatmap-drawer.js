@@ -1,5 +1,6 @@
 const chalk = require('chalk');
 const colors = require('./color-mappers');
+const coordinates = require('./coordinates');
 
 function CalculateTrackBounds(track, paddingPercent) {
     let minlat = Infinity;
@@ -32,6 +33,8 @@ function CalculateTrackBounds(track, paddingPercent) {
     return {
         width,
         height,
+        widthFeet: coordinates.longitudeToDistance(width, (north + south) / 2),
+        heightFeet: coordinates.latitudeToDistance(height),
         depth,
         maxlat: north,
         minlat: south,
@@ -49,7 +52,7 @@ const convertSpace = ([min1x, min1y], [max1x, max1y], [min2x, min2y], [max2x, ma
 module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercent) {
     const bounds = CalculateTrackBounds(track, coordinatePaddingPercent);
 
-    const imageAspect = bounds.width / bounds.height;
+    const imageAspect = bounds.widthFeet / bounds.heightFeet;
     const imageHeight = Math.floor(imageWidth / imageAspect);
 
     const worldToScreen = convertSpace(
