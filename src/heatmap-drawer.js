@@ -1,3 +1,5 @@
+const chalk = require('chalk');
+
 function CalculateTrackBounds(track, paddingPercent) {
     let minlat = Infinity;
     let maxlat = -Infinity;
@@ -58,6 +60,17 @@ module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercen
         [bounds.minlon, bounds.minlat], [bounds.maxlon, bounds.maxlat]
     );
 
+    // Case for no data, basically
+    const validDimension = dim => dim > 0 && dim !== Infinity && !isNaN(dim);
+    if (!validDimension(imageWidth) || !validDimension(imageHeight)) {
+        console.warn(chalk.black.bgRed('Warning: no track data was loaded. Check filters or tracks folder.'));
+        return {
+            pixels: new Uint8ClampedArray(4),
+            width: 1,
+            height: 1,
+            bounds: {},
+        };
+    }
     const pixels = new Uint8ClampedArray(imageWidth * imageHeight * 4);
 
     const putPixel = (x, y, r, g, b, a) => {
