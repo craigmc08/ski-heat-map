@@ -31,9 +31,8 @@ module.exports = async function Main(opts) {
     const tracks = gpxs.map(gpx => gpx.tracks);
 
     logInfo(`Applying ${chalk.yellow(opts.filters ? filters.length : 0)} track filters`);
-    const filteredTracks = tracks.map(
-        track => track.map(trkseg => trkseg.filter(filterAnyOf(filters)))
-    );
+    let filteredTracks = tracks;
+    filters.forEach(filter => filteredTracks = tracks.map(segs => segs.map(filter)));
 
     // Combine all trksegs in all gpx files
     const flatten = arr => arr.reduce((flat, el) => flat.concat(el), []);

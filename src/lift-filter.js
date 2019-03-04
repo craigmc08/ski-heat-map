@@ -30,7 +30,7 @@ const extractPositionFromPoint = trackPoint => ({
 
 const differentiateVectorArray = vectors => {
     const gradients = [];
-    for (let i = 0; i < vectors; i++) {
+    for (let i = 0; i < vectors.length; i++) {
         const startIndex = i === 0 ? 0 : i - 1;
         const startVec = vectors[startIndex];
         const endVec = vectors[startIndex + 1];
