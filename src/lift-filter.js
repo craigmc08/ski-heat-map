@@ -1,22 +1,3 @@
-/*
-
-Strategy:
-find velocity (mag and heading) for each gps point
-make array of this
-
-find acceleration of each gps point
-
-for accelerations that are less than a certain threshold, mark these points as lifts
-
-for points that are surrounded on both sides within some threshold of time by lift points,
-mark these as lifts. this ensures slight turns are changes of direction of the lift is counted
-
-remove all lift points
-
-done
-
-*/
-
 const arcLength = radius => angle => radius * angle;
 const earthRadius = 20900000; // In feet
 const earthArcLength = arcLength(earthRadius);
@@ -150,7 +131,6 @@ const filterLiftsV2 = options => track => {
             startedMovingUpTime = velocities[i].t;
         } else if (movedUp && !movingUp) {
             if (velocities[i-1].t - startedMovingUpTime > timeGoingUpHill) {
-                console.log(`Filling from ${startedMovingUpIndex} to ${i}`);
                 isLift = isLift.fill(true, startedMovingUpIndex, i);
             }
         }
