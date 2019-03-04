@@ -11,7 +11,7 @@ const defaultOptions = {
     outputFile: null,
     imageWidth: 128,
     coordinatePaddingPercent: 0.05,
-    filters: [ () => true ],
+    filters: [],
 };
 
 const logInfo = str => console.log(chalk.white(str));
@@ -32,7 +32,8 @@ module.exports = async function Main(opts) {
 
     logInfo(`Applying ${chalk.yellow(opts.filters ? filters.length : 0)} track filters`);
     let filteredTracks = tracks;
-    filters.forEach(filter => filteredTracks = tracks.map(segs => segs.map(filter)));
+    if (filters.length > 0) 
+        filters.forEach(filter => filteredTracks = tracks.map(segs => segs.map(filter)));
 
     // Combine all trksegs in all gpx files
     const flatten = arr => arr.reduce((flat, el) => flat.concat(el), []);

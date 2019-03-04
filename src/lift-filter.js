@@ -73,13 +73,14 @@ const isSandwiched = (bread, maxBreadDistance) => breadArray => {
 }
 
 /**
+ * THIS DOESN'T WORK WELL
  * Remove detected lift rides from a track
  * @param {Object} options
  * @param {number} [options.accelerationThreshold] - Value of acceleration to be considered small
  * @param {number} [options.liftSandwichDistance] - Distance to look for lift rides
  * @returns {function(Object[]): Object[]} Filtering function
  */
-module.exports = options => track => {
+const filterLiftsV1 = options => track => {
     const defaultOptions = {
         accelerationThreshold: 0.1,
         liftSandwichDistance: 5,
@@ -105,3 +106,60 @@ module.exports = options => track => {
 
     return filteredTrack;
 }
+
+const differentiateScalarArray = scalars => {
+    const derivatives = [];
+    for (let i = 0; i < scalars.length; i++) {
+        const startIndex = i === 0 ? 0 : i - 1;
+        const start = scalars[startIndex];
+        const end = scalars[startIndex + 1];
+
+        const dy = end.y - start.y;
+        const dt = end.t - start.t;
+        derivatives.push({y: dy / (dt === 0 ? 1 : dt), t: scalars[i].t});
+    }
+    return derivatives;
+};
+
+/**
+ * 
+ * @param {Object} options
+ * @param {number} [options.timeGoingUpHill] - How many seconds you must be going up before being marked as lift
+ * @returns {function(Object[]): Object[]}
+ */
+const filterLiftsV2 = options => track => {
+    const defaultOptions = {
+        timeGoingUpHill: 5, // in seconds
+    };
+    const { timeGoingUpHill } = Object.assign({}, defaultOptions, options);
+
+    const positions = track.map(point => ({
+        y: point.elevation,
+        t: point.time.getTime() / 1000,
+    }));
+    const velocities = differentiateScalarArray(positions);
+
+    let isLift = [...new Array(velocities.length)].fill(false);
+    let movedUp = false;
+    let startedMovingUpTime = -1;
+    let startedMovingUpIndex = -1;
+    for (let i = 0; i < velocities.length; i++) {
+        const movingUp = velocities[i].y > 0;
+        if (movingUp && !movedUp) {
+            startedMovingUpIndex = i;
+            startedMovingUpTime = velocities[i].t;
+        } else if (movedUp && !movingUp) {
+            if (velocities[i-1].t - startedMovingUpTime > timeGoingUpHill) {
+                console.log(`Filling from ${startedMovingUpIndex} to ${i}`);
+                isLift = isLift.fill(true, startedMovingUpIndex, i);
+            }
+        }
+
+        movedUp = movingUp;
+    }
+
+    const filteredTrack = track.filter((point, i) => !isLift[i]);
+    return filteredTrack;
+}
+
+module.exports = filterLiftsV2;
