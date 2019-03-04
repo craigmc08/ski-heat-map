@@ -1,4 +1,5 @@
 const chalk = require('chalk');
+const colors = require('./color-mappers');
 
 function CalculateTrackBounds(track, paddingPercent) {
     let minlat = Infinity;
@@ -107,7 +108,8 @@ module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercen
     for (let y = 0; y < imageHeight; y++) {
         for (let x = 0; x < imageWidth; x++) {
             const val = countMap[y][x] / (avgCount * 3);
-            putPixel(x, y, 255, 255, 255, val * 255);
+            const c = colors.thermal(val);
+            putPixel(x, y, c.r, c.g, c.b, c.a);
         }
     }
 
