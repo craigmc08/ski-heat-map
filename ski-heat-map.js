@@ -16,7 +16,7 @@ const getFilterByName = name =>
 program
     .version('0.1.0')
     .arguments('<tracksDirectory> <outputName>')
-    .option('-w --width [imageWidth]', 'Width of image in pixels', parseInt, 128)
+    .option('-w --width [imageWidth]', 'Width of image in pixels', Number, 128)
     .option('-p --padding [padding]', 'Percent to increase width of output image to pad data', parseFloat, 1)
     .option('-f --filter [filterName]', 'Filter name to use, can be specified more than once for more filters', collect, [])
     .action(processCommand)
