@@ -15,7 +15,8 @@ const defaultOptions = {
 };
 
 const logInfo = str => console.log(chalk.white(str));
-const logDetail = str => console.log(chalk.green(str));
+const logDetail = str => console.log(chalk.green.bold(str));
+const formatNum = chalk.yellow.bold;
 
 module.exports = async function Main(opts) {
     const startTime = Date.now();
@@ -25,13 +26,13 @@ module.exports = async function Main(opts) {
     if (tracksDir === null) throw new TypeError('tracksDir is a required option, but is not given.');
     if (outputFile === null) throw new TypeError('outputFile is a required option, but is not given.');
 
-    logInfo(`Loading tracks from ${chalk.yellow(tracksDir)}`);
+    logInfo(`Loading tracks from ${formatNum(tracksDir)}`);
     const gpxs = await loadTracks(tracksDir);
     logInfo(`Tracks loaded`);
 
     const tracks = gpxs.map(gpx => gpx.tracks);
 
-    logInfo(`Applying ${chalk.yellow(opts.filters ? filters.length : 0)} track filters`);
+    logInfo(`Applying ${formatNum(opts.filters ? filters.length : 0)} track filters`);
     let filteredTracks = tracks;
     if (filters.length > 0) 
         filters.forEach(filter => filteredTracks = filteredTracks.map(segs => segs.map(filter)));
@@ -46,14 +47,14 @@ module.exports = async function Main(opts) {
     logInfo(`Heatmap pixel data calculated`);
 
     logDetail(`Heatmap bound coordinates (degrees):
-(${chalk.yellow(bounds.maxlat)}, ${chalk.yellow(bounds.maxlon)})
-(${chalk.yellow(bounds.minlat)}, ${chalk.yellow(bounds.minlon)})`);
+(${formatNum(bounds.maxlat)}, ${formatNum(bounds.maxlon)})
+(${formatNum(bounds.minlat)}, ${formatNum(bounds.minlon)})`);
     
-    logInfo(`Writing image to ${chalk.yellow(outputFile)}`);
+    logInfo(`Writing image to ${formatNum(outputFile)}`);
 
     const endTime = Date.now();
     const timeToComplete = (endTime - startTime) / 1000;
-    logInfo(`Took ${chalk.yellow(`${timeToComplete} second${timeToComplete !== 1 ? 's': ''}`)} to generate heatmap`);
+    logInfo(`Took ${formatNum(`${timeToComplete} second${timeToComplete !== 1 ? 's': ''}`)} to generate heatmap`);
 
     const image = new PNG({ width, height });
     image.data = pixels;
