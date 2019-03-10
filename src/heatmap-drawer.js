@@ -1,6 +1,7 @@
 const chalk = require('chalk');
 const colors = require('./color-mappers');
 const coordinates = require('./coordinates');
+const QuadTree = require('./quadtree');
 
 function CalculateTrackBounds(track, paddingPercent) {
     let minlat = Infinity;
@@ -87,6 +88,9 @@ module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercen
 
     const sqrDistThreshold = (bounds.width / 100) ** 2;
 
+    const trackTree = new QuadTree(4, Math.sqrt(sqrDistThreshold), [bounds.minlat, bounds.minlon], [bounds.maxlat, bounds.maxlon]);
+    track.forEach(point => trackTree.addLeaf([point.latitude, point.longitude], point));
+
     const countMap = [];
     let totalCount = 0;
     let countedPixels = 0;
@@ -95,8 +99,9 @@ module.exports = function DrawHeatmap(track, imageWidth, coordinatePaddingPercen
         for (let x = 0; x < imageWidth; x++) {
             let count = 0;
             const [lon, lat] = screenToWorld([x, y]);
-            for (let i = 0; i < track.length; i++) {
-                const sqrDist = (lat - track[i].latitude)**2 + (lon - track[i].longitude)**2;
+            const nearbyPoints = trackTree.getLeavesNear([lat, lon]);
+            for (let i = 0; i < nearbyPoints.length; i++) {
+                const sqrDist = (lat - nearbyPoints[i].latitude)**2 + (lon - nearbyPoints[i].longitude)**2;
                 if (sqrDist <= sqrDistThreshold) {
                     count += 1 - sqrDist / sqrDistThreshold;
                 }
