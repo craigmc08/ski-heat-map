@@ -122,8 +122,9 @@ const filterLiftsV2 = options => track => {
     const defaultOptions = {
         timeGoingUpHill: 5, // in seconds
         slidingAverageWindowSize: 2,
+        liftSandwichDistance: 5,
     };
-    const { timeGoingUpHill, slidingAverageWindowSize } = Object.assign({}, defaultOptions, options);
+    const { timeGoingUpHill, slidingAverageWindowSize, liftSandwichDistance } = Object.assign({}, defaultOptions, options);
 
     const positions = track.map(point => ({
         y: point.elevation,
@@ -132,7 +133,7 @@ const filterLiftsV2 = options => track => {
     const velocities = differentiateScalarArray(positions);
     const smoothVelocities = slidingAverage(slidingAverageWindowSize)(velocities.map(v => v.y));
 
-    let isLift = [...new Array(velocities.length)].fill(false);
+    let isGoingUp = [...new Array(velocities.length)].fill(false);
     let movedUp = false;
     let startedMovingUpTime = -1;
     let startedMovingUpIndex = -1;
@@ -143,12 +144,16 @@ const filterLiftsV2 = options => track => {
             startedMovingUpTime = velocities[i].t;
         } else if (movedUp && !movingUp) {
             if (velocities[i-1].t - startedMovingUpTime > timeGoingUpHill) {
-                isLift = isLift.fill(true, startedMovingUpIndex, i);
+                isGoingUp = isGoingUp.fill(true, startedMovingUpIndex, i);
             }
         }
 
         movedUp = movingUp;
     }
+
+    const isSandwichedByLifts = isSandwiched(true, liftSandwichDistance)(isGoingUp);
+
+    const isLift = isGoingUp.map((hsa, i) => hsa || isSandwichedByLifts[i]);
 
     const filteredTrack = track.filter((point, i) => !isLift[i]);
     return filteredTrack;
