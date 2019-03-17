@@ -1,6 +1,6 @@
 const loadTracks = require('./tracks-loader');
 const drawTracks = require('./heatmap-drawer');
-const { filterAnyOf } = require('./util');
+const calculateBounds = require('./calculate-bounds');
 
 const PNG = require('pngjs').PNG;
 const fs = require('fs');
@@ -41,9 +41,12 @@ module.exports = async function Main(opts) {
     const flatten = arr => arr.reduce((flat, el) => flat.concat(el), []);
     const track = flatten(filteredTracks.map(trksegs => flatten(trksegs)));
     logInfo(`Tracks concatenated`);
+
+    // Calculate track bounds
+    const bounds = calculateBounds(track, coordinatePaddingPercent);
     
     logInfo(`Drawing heat map`);
-    const { pixels, width, height, bounds } = drawTracks(track, imageWidth, coordinatePaddingPercent);
+    const { pixels, width, height } = drawTracks(track, bounds, imageWidth);
     logInfo(`Heatmap pixel data calculated`);
 
     logDetail(`Heatmap bound coordinates (degrees):
