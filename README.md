@@ -19,3 +19,7 @@ The options are:
 ```
 
 Currently, it is not possible to adjust filter settings from the command line. Write a node.js script to have much more control over configuration.
+
+### Filters
+Available filters are:
+- `remove-lifts` Removes lift rides from the data
